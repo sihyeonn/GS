@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <link rel="stylesheet" href="stylesheet.css">
-  <title>Document</title>
+  <title>Product App</title>
 </head>
 <body>
   <div class="nav-bar"></div>
@@ -19,7 +19,9 @@
 
       <div class="product-info">
         <h1>{{ product }}</h1>
-        <a :href="link">More products like this</a>
+        <p v-if="inStock">In Stock</p>
+        <p v-else>Out of Stock</p>
+        <span v-show="onSale">On Sale!</span>
       </div>
 
     </div>
