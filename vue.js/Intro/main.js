@@ -64,6 +64,20 @@ Vue.component('product', {
                 Remove From Cart
         </button>
       </div>
+
+      <div>
+        <h2>Reviews</h2>
+        <ul v-if="reviews.length">
+          <li v-for="review in reviews">
+          <p>{{ review.name }}</p>
+          <p>Rating: {{ review.rating }}</p>
+          <p>{{ review.content }}</p>
+          <p>Recommendation: {{ review.recommend }}</p>
+          </li>
+        </ul>
+        <p v-else>There are no reviews yet.</p>
+      </div>
+      <productReview @review-submitted="addReview"></productReview>
     </div>
   `,
   data() {
@@ -85,7 +99,8 @@ Vue.component('product', {
           quantity: 1
         }
       ],
-      onSale: true
+      onSale: true,
+      reviews: []
     };
   },
   computed: {
@@ -115,6 +130,70 @@ Vue.component('product', {
     },
     updateProduct(index) {
       this.selectedIndex = index;
+    },
+    addReview(review) {
+      this.reviews.push(review);
+      console.log(this.reviews);
+    }
+  }
+});
+
+Vue.component('productReview', {
+  template: `
+    <form class="review-form" @submit.prevent="onSubmit">
+      <p v-if="errors.length">
+        <b>Please correct the following error(s):</b>
+        <ul>
+          <li v-for="error in errors">{{ error }}</li>
+        </ul>
+      </p>
+      <p>
+        <label for="name">Name:</label>
+        <input id="name"
+               v-model="review.name"
+               placeholder="Name"
+               required
+               >
+        </input>
+      </p>
+      <p>
+        <label for="content">Content:</label>
+        <textarea id="content"
+               v-model="review.content"
+               placeholder="Review"
+               required
+               >
+        </textarea>
+      </p>
+      <p>
+        <label for="rating">Rating:</label>
+        <select id="rating" v-model.number="review.rating">
+          <option v-for="i in 5" >{{ i }}</option>
+        </select>
+      </p>
+      <p>Would you recommend this product?</p>
+      <label>Absolutely
+        <input type="checkbox" value="Recommend" v-model="review.recommend" required />
+      </label>
+      <p>
+        <input type="submit" value="Submit">
+      </p>
+    </form>
+  `,
+  data() {
+    return { review: { recommend: true }, errors: [] }; 
+  },
+  methods: {
+    errorCheck() {
+      this.errors = [];
+      if (!this.review.rating) this.errors.push("Rating Required.");
+    },
+    onSubmit() {
+      this.errorCheck();
+      if (!this.errors.length) {
+        this.$emit('review-submitted', this.review);
+        this.review = { recommend: true };
+      }
     }
   }
 });
