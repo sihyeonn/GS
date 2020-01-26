@@ -19,6 +19,10 @@ Vue.component('product', {
       type: Boolean,
       required: false,
       default: false
+    },
+    id: {
+      type: Number,
+      required: true
     }
   },
   template: `
@@ -45,9 +49,6 @@ Vue.component('product', {
              >
         </div>
 
-        <div class="cart">
-          <p>Cart({{ cart }})</p>
-        </div>
 
         <button v-on:click="addToCart"
                 :disabled="!inStock"
@@ -57,8 +58,8 @@ Vue.component('product', {
         </button>
 
         <button @click="removeFromCart"
-                :disabled="!cart"
-                :class="{ disabledButton: !cart }"
+                :disabled="!inStock"
+                :class="{ disabledButton: !inStock }"
                 >
                 Remove From Cart
         </button>
@@ -84,7 +85,6 @@ Vue.component('product', {
           quantity: 1
         }
       ],
-      cart: 0,
       onSale: true
     };
   },
@@ -108,10 +108,10 @@ Vue.component('product', {
   },
   methods: {
     addToCart: function() {
-      if (this.cart < this.inStock) this.cart += 1;
+      this.$emit('add-to-cart', this.id, this.selectedIndex);
     },
     removeFromCart() {
-      if (0 < this.cart) this.cart -= 1;
+      this.$emit('remove-from-cart', this.id, this.selectedIndex);
     },
     updateProduct(index) {
       this.selectedIndex = index;
@@ -119,4 +119,34 @@ Vue.component('product', {
   }
 });
 
-var app = new Vue({el: '#app'})
+var app = new Vue({
+  el: '#app',
+  data: { cart: [] },
+  computed: {
+    totalCart() {
+      if (this.cart.length)
+        return this.cart.reduce((sum, i) => sum += i.count, 0).toString();
+      return '0';
+    }
+  },
+  methods: {
+    getIndexOfItem(id, index) {
+      return this.cart.findIndex(({ product_id, option }) => product_id === id && option === index);
+    },
+    addToCart(id, index) {
+      let itemIndex = this.getIndexOfItem(id, index);
+      if (-1 < itemIndex) this.cart[itemIndex].count += 1;
+      else
+        this.cart.push({product_id: id, option: index, count: 1});
+    },
+    removeFromCart(id, index) {
+      let itemIndex = this.getIndexOfItem(id, index);
+      if (-1 < itemIndex) {
+        if (this.cart[itemIndex].count === 1)
+          this.cart.splice(itemIndex, 1);
+        else
+          this.cart[itemIndex].count -= 1;
+      }
+    }
+  }
+})

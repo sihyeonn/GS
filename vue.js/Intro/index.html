@@ -11,8 +11,18 @@
   <div class="nav-bar"></div>
 
   <div id="app">
-    <product></product>
-    <product :premium="true"></product>
+    <div class="cart">
+      <p>Cart({{ totalCart }})</p>
+    </div>
+    <product :id="123"
+             @add-to-cart="addToCart"
+             @remove-from-cart="removeFromCart"
+             ></product>
+    <product :id="125"
+             :premium="true"
+             @add-to-cart="addToCart"
+             @remove-from-cart="removeFromCart"
+             ></product>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
   <script src="main.js"></script>
