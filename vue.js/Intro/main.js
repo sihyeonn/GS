@@ -23,7 +23,7 @@ var app = new Vue({
       this.cart += 1;
     },
     removeFromCart() {
-      if (0 < this.cart) this.cart -= 1;
+      this.cart -= 1;
     },
     updateProduct(image) {
       this.image = image;
